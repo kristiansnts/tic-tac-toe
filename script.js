@@ -1,24 +1,30 @@
 function GameBoard(){
-    let board = [];
-    const rows = 3;
-    const columns = 3;
+    let _board = [];
+    const _rows = 3;
+    const _columns = 3;
 
-    for (let i = 0; i < rows; i++) {
-        board[i] = [];
-        for (let j = 0; j < columns; j++){
-            board[i].push(Cell());
+    for (let i = 0; i < _rows; i++) {
+        _board[i] = [];
+        for (let j = 0; j < _columns; j++){
+            _board[i].push(Cell());
         }
     }
     
-    const getBoard = () => board;
+    const getBoard = () => _board;
 
     const dropMove = (column, row, player) => {
-        board[row][column].addMove(player)
+        _board[row][column].addMove(player)
     }
 
     const printBoard = () => {
-        const boardWithValue = board.map((row) => row.map((cell) => cell.getValue()))
+
+        const _rules = Rules();
+
+        const boardWithValue = _board.map((row) => row.map((cell) => cell.getValue()))
         console.log(boardWithValue);
+
+        _rules.checkRow(boardWithValue);
+        
     }
 
     return {
@@ -28,23 +34,50 @@ function GameBoard(){
     }
 }
 
+function Rules() {
+
+   const checkRow = (board) => {
+        let res = []
+
+        for (let i = 0; i < board.length; i++){
+            if(board[i].every(current => current == 'X' || current == 'O')){
+                res.push(true);
+            } else {
+                res.push(false);
+            }
+
+        }
+
+        const winCondition = (condition) => condition === true;
+
+        const checkWin = () => res.some(winCondition) ? console.log('You Win') : '';
+        checkWin();
+   }
+
+
+   return {
+        checkRow,
+   }
+
+}
+
 function Cell() {
-    let value = "";
+    let _value = "";
 
     const addMove = (player) => {
-        value = player;
+        _value = player;
     };
 
-    const getValue = () => value;
+    const getValue = () => _value;
 
     return {getValue, addMove}
 }
 
 function GameController() {
 
-    const board = GameBoard();
+    const _board = GameBoard();
 
-    const players = [
+    const _players = [
         {
             name: 'PlayerX',
             token: 'X'
@@ -55,22 +88,23 @@ function GameController() {
         }
     ];
 
-    let activePlayer = players[0]
+    let activePlayer = _players[0]
 
     const getActivePlayer = () => activePlayer;
 
     const switchPlayer = () => {
-        activePlayer = activePlayer === players[0] ? players[1] : players[0];
+        activePlayer = activePlayer === _players[0] ? _players[1] : _players[0];
         return {activePlayer};
     }
 
     const printNewRound = () => {
-        board.printBoard();
+        _board.printBoard();
     }
+
 
     const playRound = (column, row) => {
         console.log(`${getActivePlayer().name} is Dropping move at column ${column}, and row ${row}`);
-        board.dropMove(column, row, getActivePlayer().token)
+        _board.dropMove(column, row, getActivePlayer().token)
         switchPlayer();
         printNewRound();
     }
