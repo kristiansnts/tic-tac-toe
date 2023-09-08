@@ -13,7 +13,13 @@ function GameBoard(){
     const getBoard = () => _board;
 
     const dropMove = (column, row, player) => {
-        _board[row][column].addMove(player)
+        if(_board[row][column].getValue() == '') {
+            _board[row][column].addMove(player)
+            return true;
+        } else {
+            alert('please choose empty cell!!')
+            return false;
+        }
     }
 
     const printBoard = () => {
@@ -21,11 +27,13 @@ function GameBoard(){
         const _rules = Rules();
 
         const boardWithValue = _board.map((row) => row.map((cell) => cell.getValue()))
-        console.log(boardWithValue);
 
-        _rules.checkDiag(boardWithValue);
-        _rules.checkColumn(boardWithValue);
-        _rules.checkRow(boardWithValue);
+        if(_rules.checkDiag(boardWithValue) || _rules.checkColumn(boardWithValue) || _rules.checkRow(boardWithValue)){
+            return [boardWithValue,false];
+        } 
+        // console.log(_rules.checkColumn(boardWithValue),  _rules.checkRow(boardWithValue), _rules.checkDiag(boardWithValue))
+        return boardWithValue
+
     }
 
     return {
@@ -36,12 +44,14 @@ function GameBoard(){
 }
 
 function Rules() {
-    
+
     const checkRow = (board) => {
         let res = [];
 
         for (let i = 0; i < board.length; i++){
-            if(board[i].every(current => current == 'X' || current == 'O')){
+            if(board[i].every(current => current == 'X' )){
+                res.push(true);
+            } else if(board[i].every(current => current == 'O')){
                 res.push(true);
             } else {
                 res.push(false);
@@ -49,9 +59,13 @@ function Rules() {
         }
 
         const winCondition = (condition) => condition === true; 
-        
-        const checkWin = () => res.some(winCondition) ? console.log('You Win') : '';
-        checkWin();
+
+        const checkWin = () => {
+            if(res.some(winCondition)) {
+               return true
+            }
+        }
+       return checkWin();
     }
 
     
@@ -66,7 +80,7 @@ function Rules() {
 
         const row = tranpose(board);
 
-        checkRow(row);
+        return checkRow(row);
     }
 
     const checkDiag = (board) => {
@@ -74,10 +88,10 @@ function Rules() {
         let diagonal2 = [board[2][0], board[1][1], board[0][2]];
 
         if(diagonal1.every(current => current == 'X' || current == 'O')){
-            console.log('You Win')
+            return true
         } else if (diagonal2.every(current => current == 'X' || current == 'O')){
-            console.log('You Win')
-        }
+            return true
+        } 
 
     }
 
@@ -117,7 +131,7 @@ function GameController() {
         }
     ];
 
-    let activePlayer = _players[1]
+    let activePlayer = _players[0]
 
     const getActivePlayer = () => activePlayer;
 
@@ -126,23 +140,46 @@ function GameController() {
         return {activePlayer};
     }
 
-    const printNewRound = () => {
-        _board.printBoard();
-    }
+    let _gameCondition = true
 
+    const getGameCondition = () => _gameCondition;
+
+    const printNewRound = () => {
+        if(_board.printBoard().length == 2){
+            console.log(_board.printBoard()[0])
+            _gameCondition = _board.printBoard()[1]
+            console.log('You Win');
+        } else {
+            console.log(_board.printBoard())
+        }
+    }
 
     const playRound = (column, row) => {
-        console.log(`${getActivePlayer().name} is Dropping move at column ${column}, and row ${row}`);
-        _board.dropMove(column, row, getActivePlayer().token)
-        // switchPlayer();
+        if(_board.dropMove(column, row, getActivePlayer().token)){
+            console.log(`${getActivePlayer().name} is Dropping move at column ${column}, and row ${row}`);
+            switchPlayer();
+        }
         printNewRound();
     }
+
+    const twoPlayer = () => {
+        alert(`You're ${getActivePlayer().name}, please input column and row you will place!`);
+        const column = parseInt(prompt('Insert your column from 0 to 2'));
+        const row = parseInt(prompt('Insert your row from 0 to 2'));
+        playRound(column, row);
+        if(getGameCondition() == true){
+            twoPlayer();
+        } else {
+            return;
+        }
+    }  
 
     printNewRound();
 
     return {
         playRound,
-        getActivePlayer
+        twoPlayer,
+        getActivePlayer,
     }
 }
 
