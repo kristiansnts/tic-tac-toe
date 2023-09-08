@@ -17,7 +17,7 @@ function GameBoard(){
             _board[row][column].addMove(player)
             return true;
         } else {
-            alert('please choose empty cell!!')
+            alert('please choose empty cell!!');
             return false;
         }
     }
@@ -87,11 +87,15 @@ function Rules() {
         let diagonal1 = [board[0][0], board[1][1], board[2][2]];
         let diagonal2 = [board[2][0], board[1][1], board[0][2]];
 
-        if(diagonal1.every(current => current == 'X' || current == 'O')){
+        if(diagonal1.every(current => current == 'X')){
             return true
-        } else if (diagonal2.every(current => current == 'X' || current == 'O')){
+        } else if (diagonal1.every(current => current == 'O')){
             return true
-        } 
+        } else if (diagonal2.every(current => current == 'X')){
+            return true
+        } else if (diagonal2.every(current => current == 'O')){
+            return true
+        }
 
     }
 
@@ -160,6 +164,7 @@ function GameController() {
             switchPlayer();
         }
         printNewRound();
+        getRandom()
     }
 
     const twoPlayer = () => {
@@ -174,13 +179,48 @@ function GameController() {
         }
     }  
 
+    const vsComp = () => {
+        if(getActivePlayer().token == 'O'){
+            [row, column] = getRandom();
+            alert(`Computer put row ${row}, and column ${column}`);
+            playRound(column, row)
+        } else {
+            alert(`You're ${getActivePlayer().name}, please input column and row you will place!`);
+            const column = parseInt(prompt('Insert your column from 0 to 2'));
+            const row = parseInt(prompt('Insert your row from 0 to 2'));
+            playRound(column, row);
+        }
+        if(getGameCondition() == true){
+            vsComp();
+        } else {
+            return;
+        }
+    }
+
+    const getRandom = () => {
+        const board = _board.getBoard().map(row => row.map(cell => cell.getValue()));
+        let rows = []
+        let cols = []
+        board.forEach((row, rIndex) => row.forEach((item, cIndex) => {
+            if(item == ''){
+                rows.push(rIndex)
+                cols.push(cIndex)
+            }
+        }));
+        const randomRow = rows[Math.floor(Math.random()*rows.length)];
+        const randomCol = cols[Math.floor(Math.random()*cols.length)];
+        return [randomRow, randomCol];
+    }
+
     printNewRound();
 
     return {
         playRound,
         twoPlayer,
         getActivePlayer,
+        vsComp
     }
 }
 
 const game = GameController();
+game.vsComp();
