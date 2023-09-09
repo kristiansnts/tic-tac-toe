@@ -29,9 +29,14 @@ function GameBoard(){
         const boardWithValue = _board.map((row) => row.map((cell) => cell.getValue()))
 
         if(_rules.checkDiag(boardWithValue) || _rules.checkColumn(boardWithValue) || _rules.checkRow(boardWithValue)){
-            return [boardWithValue,false];
+            return [boardWithValue, true];
+        }
+        
+        if (_rules.checkDraw(boardWithValue)){
+            return [boardWithValue, false]
         } 
         // console.log(_rules.checkColumn(boardWithValue),  _rules.checkRow(boardWithValue), _rules.checkDiag(boardWithValue))
+        
         return boardWithValue
 
     }
@@ -96,6 +101,26 @@ function Rules() {
         } else if (diagonal2.every(current => current == 'O')){
             return true
         }
+    }
+
+    const checkDraw = (board) => {
+
+        const filterBoard = []
+
+        for(let i = 0; i < board.length; i++){
+            for(let j = 0; j < board.length; j++){
+                if(board[i][j] == ''){
+                    filterBoard.push([j,i])
+                }
+            }
+        }
+        
+        
+        if(filterBoard.length == 0){
+            return true
+        } else {
+            return false
+        }
 
     }
 
@@ -103,7 +128,8 @@ function Rules() {
    return {
         checkRow,
         checkColumn,
-        checkDiag
+        checkDiag,
+        checkDraw
    }
 
 }
@@ -148,11 +174,19 @@ function GameController() {
 
     const getGameCondition = () => _gameCondition;
 
+    let gameMessage = (condition) => {
+        if(condition == false) {
+            console.log('You Draw')
+        } else {
+            console.log('You Win')
+        }
+    }
+
     const printNewRound = () => {
         if(_board.printBoard().length == 2){
             console.log(_board.printBoard()[0])
             _gameCondition = _board.printBoard()[1]
-            console.log('You Win');
+            gameMessage(_board.printBoard()[1]);
         } else {
             console.log(_board.printBoard())
         }
@@ -223,4 +257,13 @@ function GameController() {
 }
 
 const game = GameController();
-game.vsComp();
+// game.vsComp();
+game.playRound(0,0)
+game.playRound(0,1)
+game.playRound(0,2)
+game.playRound(1,0)
+game.playRound(1,1)
+game.playRound(2,0)
+game.playRound(2,1)
+game.playRound(2,2)
+game.playRound(1,2)
