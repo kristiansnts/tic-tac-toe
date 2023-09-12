@@ -61,9 +61,25 @@ function Rules() {
         return checkRow(row);
     }
 
+    const checkDiag = (board) => {
+        let diagonal1 = [board[0][0], board[1][1], board[2][2]];
+        let diagonal2 = [board[2][0], board[1][1], board[0][2]];
+
+        if(diagonal1.every(current => current == 'X')){
+            return true
+        } else if (diagonal1.every(current => current == 'O')){
+            return true
+        } else if (diagonal2.every(current => current == 'X')){
+            return true
+        } else if (diagonal2.every(current => current == 'O')){
+            return true
+        }
+    }
+
     return {
         checkRow,
-        checkColumn
+        checkColumn,
+        checkDiag
     }
 
 }
@@ -96,7 +112,7 @@ function GameController() {
     const printRound = () => {
         let boardValue = board.getBoard();
         
-        if(rules.checkRow(boardValue) || rules.checkColumn(boardValue)){
+        if(rules.checkRow(boardValue) || rules.checkColumn(boardValue) || rules.checkDiag(boardValue)){
             setGameCondition(false)
             return [boardValue, true]
         }
@@ -143,4 +159,4 @@ function GameController() {
 }
 
 const game = GameController();
-game.twoPlayer();
+// game.twoPlayer();
