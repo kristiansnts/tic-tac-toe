@@ -76,10 +76,31 @@ function Rules() {
         }
     }
 
+    const checkDraw = (board) => {
+
+        const filterBoard = []
+
+        for(let i = 0; i < board.length; i++){
+            for(let j = 0; j < board.length; j++){
+                if(board[i][j] == ''){
+                    filterBoard.push([j,i])
+                }
+            }
+        }
+
+        if(filterBoard.length == 0){
+            return true
+        } else {
+            return false
+        }
+
+    }
+
     return {
         checkRow,
         checkColumn,
-        checkDiag
+        checkDiag,
+        checkDraw
     }
 
 }
@@ -115,6 +136,9 @@ function GameController() {
         if(rules.checkRow(boardValue) || rules.checkColumn(boardValue) || rules.checkDiag(boardValue)){
             setGameCondition(false)
             return [boardValue, true]
+        } else if (rules.checkDraw(boardValue)){
+            setGameCondition(false)
+            return [boardValue, false]
         }
 
         return boardValue;
@@ -124,6 +148,8 @@ function GameController() {
         if(printRound().length == 2){
             if(printRound()[1] == true){
                 console.log(`${getActivePlayer().name} Win`)
+            } else if (printRound()[1] == false){
+                console.log('Draw');
             }
         } else {
             console.log(printRound())
@@ -159,4 +185,4 @@ function GameController() {
 }
 
 const game = GameController();
-// game.twoPlayer();
+game.twoPlayer();
