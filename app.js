@@ -16,8 +16,8 @@ function GameBoard(){
             _board[row][column] = player
             return true;
         } else {
-            alert('Please Select Empty Cell');
             return false;
+            alert('Please Select Empty Cell'); 
         }
     }
 
@@ -170,6 +170,34 @@ function GameController() {
     }
 
     const getGameCondition = () => gameCondition;
+    
+    const newRound = (round) => {
+        swithPlayer();
+        if(getGameCondition() == true) {
+            round();
+        } else {
+            return;
+        }
+    }
+
+    const getRandomMove = () => {
+        const boardValue = board.getBoard();
+        let rows = []
+        let cols = []
+        
+        for (let i = 0; i < 3; i++){
+            for (let j = 0; j < 3; j++){
+                if(boardValue[i][j] == ''){
+                    rows.push(i);
+                    cols.push(j)
+                }
+            }
+        }
+        const randomRow = rows[Math.floor(Math.random()*rows.length)];
+        const randomCol = cols[Math.floor(Math.random()*cols.length)];
+        return [randomRow, randomCol];
+    }
+
 
     const twoPlayer = (row, column) => {
         alert(`You're ${getActivePlayer().name}, please input your move`)
@@ -179,19 +207,39 @@ function GameController() {
             console.log(winnerMessage());
         } else {
             twoPlayer();
-        }
-        swithPlayer();
-        if(getGameCondition() == true) {
-            twoPlayer();
+        }    
+        newRound(twoPlayer);
+    }    
+
+    const vsComp = () => {
+        if(getActivePlayer().token == 'O'){
+            [row, column] = getRandomMove();
+            if(board.setMove(row, column, getActivePlayer().token) == true){
+                alert(`Computer was put move on row: ${row}, and colum: ${column}`)
+                console.log(winnerMessage());
+            } else {
+                vsComp();
+            }
+            newRound(vsComp);
         } else {
-            return;
+            alert(`You're ${getActivePlayer().name}, please input your move`)
+            row = parseInt(prompt("input your row!"));
+            column = parseInt(prompt("input your column!"));
+            if(board.setMove(row, column, getActivePlayer().token) == true){
+                console.log(winnerMessage());
+            } else {
+                vsComp();
+            }
+            newRound(vsComp);
         }
     }
 
     return {
-        twoPlayer
+        twoPlayer,
+        vsComp
     }
 }
 
 const game = GameController();
-game.twoPlayer();
+// game.twoPlayer();
+// game.vsComp()
