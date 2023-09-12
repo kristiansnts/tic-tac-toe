@@ -48,8 +48,22 @@ function Rules() {
        return checkWin();
     }
 
+    const checkColumn = (board) => {
+        
+        const tranpose = (arr) => {
+            let [row] = arr;
+    
+            return row.map((value, column) => arr.map(row => row[column]))
+        }
+
+        const row = tranpose(board);
+
+        return checkRow(row);
+    }
+
     return {
-        checkRow
+        checkRow,
+        checkColumn
     }
 
 }
@@ -82,7 +96,7 @@ function GameController() {
     const printRound = () => {
         let boardValue = board.getBoard();
         
-        if(rules.checkRow(boardValue)){
+        if(rules.checkRow(boardValue) || rules.checkColumn(boardValue)){
             setGameCondition(false)
             return [boardValue, true]
         }
@@ -129,4 +143,4 @@ function GameController() {
 }
 
 const game = GameController();
-// game.twoPlayer();
+game.twoPlayer();
