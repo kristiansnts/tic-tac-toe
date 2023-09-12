@@ -12,7 +12,13 @@ function GameBoard(){
     }
 
     const setMove = (row, column, player) => {
-        _board[row][column] = player
+        if(_board[row][column] == ''){
+            _board[row][column] = player
+            return true;
+        } else {
+            alert('Please Select Empty Cell');
+            return false;
+        }
     }
 
     const getBoard = () => _board;
@@ -169,8 +175,11 @@ function GameController() {
         alert(`You're ${getActivePlayer().name}, please input your move`)
         row = parseInt(prompt("input your row!"));
         column = parseInt(prompt("input your column!"));
-        board.setMove(row, column, getActivePlayer().token);
-        console.log(winnerMessage());
+        if(board.setMove(row, column, getActivePlayer().token) == true){
+            console.log(winnerMessage());
+        } else {
+            twoPlayer();
+        }
         swithPlayer();
         if(getGameCondition() == true) {
             twoPlayer();
