@@ -361,11 +361,6 @@ function GameController() {
     }
 }
 
-const game = GameController();
-// game.twoPlayer();
-// game.vsComp()
-// game.vsAi()
-
 
 
 
