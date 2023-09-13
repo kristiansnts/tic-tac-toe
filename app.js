@@ -140,27 +140,61 @@ function GameController() {
         let boardValue = board.getBoard();
         
         if(rules.checkRow(boardValue) || rules.checkColumn(boardValue) || rules.checkDiag(boardValue)){
-            setGameCondition(false)
             return [boardValue, true]
         } else if (rules.checkDraw(boardValue)){
-            setGameCondition(false)
             return [boardValue, false]
         }
-
+        
         return boardValue;
     }
-
+    
     const winnerMessage = () => {
+        let boardValue = board.getBoard()
+        let result = checkWinner(boardValue);
+        console.log(boardValue)
         if(printRound().length == 2){
-            if(printRound()[1] == true){
-                console.log(`${getActivePlayer().name} Win`)
-            } else if (printRound()[1] == false){
-                console.log('Draw');
+            if(result == 'X'){
+                setGameCondition(false)
+                console.log('X Winner')
+            } else if (result == 'O'){
+                setGameCondition(false)
+                console.log('O Winner')
+            } else if(printRound()[1] == false){
+                setGameCondition(false)
+                console.log('Draw')
             }
-        } else {
-            console.log(printRound())
+        }
+        
+    }
+
+    const winnerCondition = [
+        [[0, 0], [0, 1], [0, 2]],
+        [[1, 0], [1, 1], [1, 2]],
+        [[2, 0], [2, 1], [2, 2]],
+        [[0, 0], [1, 0], [2, 0]],
+        [[0, 1], [1, 1], [2, 1]],
+        [[0, 2], [1, 2], [2, 2]],
+        [[0, 0], [1, 1], [2, 2]],
+        [[0, 2], [1, 1], [2, 0]]   
+    ];
+
+    const checkWinner = (board) => {
+        for (let i = 0; i < winnerCondition.length; i++) {
+            const [a, b, c] = winnerCondition[i];
+            if (
+                board[a[0]][a[1]] &&
+                board[a[0]][a[1]] === board[b[0]][b[1]] &&
+                board[a[0]][a[1]] === board[c[0]][c[1]]
+            ) {
+                return board[a[0]][a[1]];
+            }
         }
 
+        if(printRound().length == 2 && printRound()[1] == false){
+            return 'draw';
+        }
+
+        return null;
     }
 
     let gameCondition = true;
@@ -196,6 +230,69 @@ function GameController() {
         const randomRow = rows[Math.floor(Math.random()*rows.length)];
         const randomCol = cols[Math.floor(Math.random()*cols.length)];
         return [randomRow, randomCol];
+    }
+
+    const getBestMove = (boardValue) => {
+        let bestScore = -Infinity;
+        let bestMove;
+
+        for (let i = 0; i < 3; i++){
+            for (let j = 0; j < 3; j++){
+                if(boardValue[i][j] == ''){
+                    boardValue[i][j] = 'O';
+                    let score = minimax(boardValue, 0, false);
+                    boardValue[i][j] = '';
+                    if(score > bestScore){
+                        bestScore = score;
+                        bestMove = [i, j];
+                    }
+                }
+            }
+        }
+        return bestMove;
+    }
+
+    const minimax = (boardValue, depth, isMaximizing) => {
+
+        let scores = {
+            'O': 1,
+            'X': -1,
+            'draw': 0
+        }
+
+        let result = checkWinner(boardValue);
+        if(result !== null){
+            return scores[result];
+        }
+
+        if(isMaximizing){
+            let bestScore = -Infinity;
+            for (let i = 0; i < 3; i++){
+                for (let j = 0; j < 3; j++){
+                    if(boardValue[i][j] == ''){
+                        boardValue[i][j] = 'O';
+                        let score = minimax(boardValue, depth + 1, false);
+                        boardValue[i][j] = '';
+                        bestScore = Math.max(score, bestScore)
+                    }
+                }
+            }
+            return bestScore;
+        } else {
+            let bestScore = Infinity;
+            for (let i = 0; i < 3; i++){
+                for (let j = 0; j < 3; j++){
+                    if(boardValue[i][j] == ''){
+                        boardValue[i][j] = 'X';
+                        let score = minimax(boardValue, depth + 1, true);
+                        boardValue[i][j] = '';
+                        bestScore = Math.min(score, bestScore)
+                    }
+                }
+            }
+            return bestScore;
+        }
+
     }
 
 
@@ -234,12 +331,41 @@ function GameController() {
         }
     }
 
+    const vsAi = () => {
+        if(getActivePlayer().token == 'O'){
+            [row, column] = getBestMove(board.getBoard());
+            if(board.setMove(row, column, getActivePlayer().token) == true){
+                alert(`Computer was put move on row: ${row}, and colum: ${column}`)
+                console.log(winnerMessage());
+            } else {
+                vsAi();
+            }
+            newRound(vsAi);
+        } else {
+            alert(`You're ${getActivePlayer().name}, please input your move`)
+            row = parseInt(prompt("input your row!"));
+            column = parseInt(prompt("input your column!"));
+            if(board.setMove(row, column, getActivePlayer().token) == true){
+                console.log(winnerMessage());
+            } else {
+                vsAi();
+            }
+            newRound(vsAi);
+        }
+    }
+
     return {
         twoPlayer,
-        vsComp
+        vsComp,
+        vsAi
     }
 }
 
 const game = GameController();
 // game.twoPlayer();
 // game.vsComp()
+game.vsAi()
+
+
+
+
