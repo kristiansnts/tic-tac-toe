@@ -117,6 +117,8 @@ function GameController() {
 
     const rules = Rules()
 
+    const render = DisplayController();
+
     const players = [
         {
             name: 'Player X',
@@ -140,11 +142,13 @@ function GameController() {
         let boardValue = board.getBoard();
         
         if(rules.checkRow(boardValue) || rules.checkColumn(boardValue) || rules.checkDiag(boardValue)){
+            render.setBoard(boardValue);
             return [boardValue, true]
         } else if (rules.checkDraw(boardValue)){
+            render.setBoard(boardValue);
             return [boardValue, false]
         }
-        
+        render.setBoard(boardValue);
         return boardValue;
     }
     
@@ -295,7 +299,6 @@ function GameController() {
 
     }
 
-
     const twoPlayer = (row, column) => {
         alert(`You're ${getActivePlayer().name}, please input your move`)
         row = parseInt(prompt("input your row!"));
@@ -362,5 +365,27 @@ function GameController() {
 }
 
 
+function DisplayController(){
 
+    const boardUI = document.getElementById('board');
+    
+    const _board = GameBoard();
+    
+    const setBoard = (board) => {
+        let cell = "";
+        for(let i = 0; i < 3; i++){
+            for(let j = 0; j < 3; j++){
+                cell += `<button type="button" class="cell" data-row="${i}" data-column="${j}">${board[i][j]}</button>`;
+            }
+        }
+        boardUI.innerHTML = cell;
+    }
 
+    return {
+        setBoard
+    }
+
+}
+
+const game = GameController()
+// game.twoPlayer();
