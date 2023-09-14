@@ -23,8 +23,19 @@ function GameBoard(){
 
     const getBoard = () => _board;
 
+    const resetBoard = () => {
+        for (let i = 0; i < row; i++){
+            _board[i] = []
+            for (let j = 0; j < col; j++){
+                _board[i].push('');
+            }
+        }
+        return getBoard();
+    }
+
     return {
         getBoard,
+        resetBoard,
         setMove
     }
 }
@@ -143,29 +154,27 @@ function GameController() {
         
         if(rules.checkRow(boardValue) || rules.checkColumn(boardValue) || rules.checkDiag(boardValue)){
             render.setBoard(boardValue);
-            return [boardValue, true]
+            return true
         } else if (rules.checkDraw(boardValue)){
             render.setBoard(boardValue);
-            return [boardValue, false]
+            return false
         }
         render.setBoard(boardValue);
-        return boardValue;
     }
     
     const winnerMessage = () => {
         let boardValue = board.getBoard()
         let result = checkWinner(boardValue);
-        console.log(boardValue)
-        if(printRound().length == 2){
+        if(printRound()){
             if(result == 'X'){
                 setGameCondition(false)
-                console.log('X Winner')
+                render.winnerMessage(result);
             } else if (result == 'O'){
                 setGameCondition(false)
-                console.log('O Winner')
-            } else if(printRound()[1] == false){
+                render.winnerMessage(result);
+            } else if(result == 'draw'){
                 setGameCondition(false)
-                console.log('Draw')
+                render.winnerMessage(result);
             }
         }
         
@@ -194,7 +203,7 @@ function GameController() {
             }
         }
 
-        if(printRound().length == 2 && printRound()[1] == false){
+        if(printRound() == false){
             return 'draw';
         }
 
@@ -367,6 +376,12 @@ function GameController() {
                 twoPlayer(row, column);
             }
         });
+
+        window.addEventListener('click', (e) => {
+            if(e.target.id == 'reset-button'){
+                render.setBoard(board.resetBoard());
+            }
+        })
     })
 
 
@@ -378,19 +393,18 @@ function GameController() {
     }
 }
 
-function GameMode() {
-    
-}
-
 
 function DisplayController(){
     
     const boardUI = document.getElementById('board');
     const turnUI = document.querySelector('#turn');
+    const resetButtonUI = document.getElementById('reset-button');
     const gameModeUI = document.getElementById('game-mode');
+    const winnerMessageUI = document.getElementById('winner-message');
 
     const reset = () => {
         turnUI.classList.remove('hidden');
+        resetButtonUI.classList.remove('hidden');
         gameModeUI.style.display = "none";
     }
 
@@ -409,9 +423,14 @@ function DisplayController(){
         turnUI.textContent = content;
     }
 
+    const winnerMessage = (result) => {
+        winnerMessageUI.textContent = `${result !== 'draw' ? result + ' Winner' : 'Draw'}`;
+    }
+
     return {
         setBoard,
         playerTurn,
+        winnerMessage,
         reset
     }
 
