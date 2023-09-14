@@ -362,7 +362,8 @@ function GameController() {
         }
     });
 
-    render.setBoard(board.getBoard());
+    // render.setBoard(board.getBoard());
+    // render.reset();
 
     return {
         twoPlayer,
@@ -375,7 +376,13 @@ function GameController() {
 function DisplayController(){
     
     const boardUI = document.getElementById('board');
-    const turnUI = document.querySelector('#turn h3');
+    const turnUI = document.querySelector('#turn');
+    const gameModeUI = document.getElementById('game-mode');
+
+    const reset = () => {
+        turnUI.classList.remove('hidden');
+        gameModeUI.style.display = "none";
+    }
 
     const setBoard = (board) => {
         let cell = "";
@@ -394,7 +401,8 @@ function DisplayController(){
 
     return {
         setBoard,
-        playerTurn
+        playerTurn,
+        reset
     }
 
 }

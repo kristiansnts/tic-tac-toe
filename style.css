@@ -1,16 +1,15 @@
 body {
     background-color: #ccc;
+    overflow-y: hidden;
 }
 
 #app {
     width: 300px;
     padding: 10px;
     margin: 30px auto;
-
 }
 
 #app h1.lead-text {
-    /* color: white; */
     text-align: center;
     font-size: 24px;
     font-weight: bold;
@@ -32,7 +31,9 @@ body {
     border: 1px solid black;
 }
 
-#turn h3{
+#turn{
+    font-size: 1.2rem;
+    font-weight: bold;
     border-bottom: 2px solid rgb(238, 49, 35);
     text-align: center;
 }
@@ -42,4 +43,37 @@ body {
     font-size: 3rem;
     font-weight: bold;
     text-align: center;
+}
+
+#game-mode {
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.btn {
+    display: block;
+    padding: 10px 20px;
+    margin: 15px 0;
+    border-radius: 10px;
+    background-color: blue;
+    color: white;
+    box-shadow: 10px 10px 21px -8px rgba(0,0,0,0.75);
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: red;
+    color: white;
+}
+
+a.btn {
+    text-align: center;
+    text-decoration: none;
+    font-size: 1.3rem; 
+}
+
+.hidden {
+    display: none;
 }
