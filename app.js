@@ -296,13 +296,10 @@ function GameController() {
             }
             return bestScore;
         }
-
     }
 
     const twoPlayer = (row, column) => {
-        alert(`You're ${getActivePlayer().name}, please input your move`)
-        row = parseInt(prompt("input your row!"));
-        column = parseInt(prompt("input your column!"));
+        render.playerTurn(getActivePlayer().name);
         if(board.setMove(row, column, getActivePlayer().token) == true){
             console.log(winnerMessage());
         } else {
@@ -357,6 +354,16 @@ function GameController() {
         }
     }
 
+    window.addEventListener('click', (e) => {
+        if(e.target.classList.contains('cell')){
+            row = e.target.getAttribute('data-row');
+            column = e.target.getAttribute('data-column')
+            twoPlayer(row, column);
+        }
+    });
+
+    render.setBoard(board.getBoard());
+
     return {
         twoPlayer,
         vsComp,
@@ -366,11 +373,10 @@ function GameController() {
 
 
 function DisplayController(){
-
+    
     const boardUI = document.getElementById('board');
-    
-    const _board = GameBoard();
-    
+    const turnUI = document.querySelector('#turn h3');
+
     const setBoard = (board) => {
         let cell = "";
         for(let i = 0; i < 3; i++){
@@ -381,8 +387,14 @@ function DisplayController(){
         boardUI.innerHTML = cell;
     }
 
+    const playerTurn = (player) => {
+        let content = `${player} Turn`
+        turnUI.textContent = content;
+    }
+
     return {
-        setBoard
+        setBoard,
+        playerTurn
     }
 
 }
