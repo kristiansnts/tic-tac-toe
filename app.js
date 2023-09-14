@@ -354,22 +354,32 @@ function GameController() {
         }
     }
 
-    window.addEventListener('click', (e) => {
-        if(e.target.classList.contains('cell')){
-            row = e.target.getAttribute('data-row');
-            column = e.target.getAttribute('data-column')
-            twoPlayer(row, column);
-        }
-    });
+    const twoPlayerButton = document.getElementById('two-player');
 
-    // render.setBoard(board.getBoard());
-    // render.reset();
+    twoPlayerButton.addEventListener('click', () => {
+        render.reset();
+        render.setBoard(board.getBoard());
+    
+        window.addEventListener('click', (e) => {
+            if(e.target.classList.contains('cell')){
+                row = e.target.getAttribute('data-row');
+                column = e.target.getAttribute('data-column')
+                twoPlayer(row, column);
+            }
+        });
+    })
+
+
 
     return {
         twoPlayer,
         vsComp,
         vsAi
     }
+}
+
+function GameMode() {
+    
 }
 
 
@@ -408,4 +418,4 @@ function DisplayController(){
 }
 
 const game = GameController()
-// game.twoPlayer();
+
