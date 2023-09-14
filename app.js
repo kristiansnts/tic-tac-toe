@@ -145,6 +145,10 @@ function GameController() {
 
     const getActivePlayer = () => activePlayer;
 
+    const resetPlayer = () => {
+        activePlayer = players[0];
+    }
+
     const swithPlayer = () => {
         activePlayer = activePlayer == players[0] ? players[1] : players[0];
     }
@@ -380,6 +384,8 @@ function GameController() {
         window.addEventListener('click', (e) => {
             if(e.target.id == 'reset-button'){
                 render.setBoard(board.resetBoard());
+                resetPlayer();
+                render.reset();
             }
         })
     })
@@ -406,8 +412,9 @@ function DisplayController(){
         turnUI.classList.remove('hidden');
         resetButtonUI.classList.remove('hidden');
         gameModeUI.style.display = "none";
+        winnerMessageUI.classList.add('hidden');
     }
-
+    
     const setBoard = (board) => {
         let cell = "";
         for(let i = 0; i < 3; i++){
@@ -417,14 +424,15 @@ function DisplayController(){
         }
         boardUI.innerHTML = cell;
     }
-
+    
     const playerTurn = (player) => {
         let content = `${player} Turn`
         turnUI.textContent = content;
     }
-
+    
     const winnerMessage = (result) => {
-        winnerMessageUI.textContent = `${result !== 'draw' ? result + ' Winner' : 'Draw'}`;
+        winnerMessageUI.classList.remove('hidden');
+        winnerMessageUI.textContent = `${result == 'draw' ? 'Draw' : result + ' Winner'}`;
     }
 
     return {
