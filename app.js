@@ -381,7 +381,7 @@ function DisplayController(){
         let cell = "";
         for(let i = 0; i < 3; i++){
             for(let j = 0; j < 3; j++){
-                cell += `<button type="button" class="cell" data-row="${i}" data-column="${j}">${board[i][j]}</button>`;
+                cell += `<button type="button" class="cell" style="color:${board[i][j] == 'X' ? 'red' : 'blue'}" data-row="${i}" data-column="${j}">${board[i][j]}</button>`;
             }
         }
         boardUI.innerHTML = cell;

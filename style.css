@@ -28,11 +28,18 @@ body {
 
 .cell {
     text-align: center;
-    font-size: 24px;
+    font-size: 3rem;
     border: 1px solid black;
 }
 
 #turn h3{
     border-bottom: 2px solid rgb(238, 49, 35);
+    text-align: center;
+}
+
+#winner-message {
+    color: black;
+    font-size: 3rem;
+    font-weight: bold;
     text-align: center;
 }
