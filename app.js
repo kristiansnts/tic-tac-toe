@@ -379,15 +379,19 @@ function GameController() {
                 column = e.target.getAttribute('data-column')
                 twoPlayer(row, column);
             }
-        });
 
-        window.addEventListener('click', (e) => {
             if(e.target.id == 'reset-button'){
-                render.setBoard(board.resetBoard());
                 resetPlayer();
+                render.playerTurn(getActivePlayer().name);
+                render.setBoard(board.resetBoard());
                 render.reset();
             }
-        })
+
+            if(e.target.id == 'back-to-game-mode'){
+                render.homeScreen();
+            }
+        });
+        
     })
 
 
@@ -405,13 +409,25 @@ function DisplayController(){
     const boardUI = document.getElementById('board');
     const turnUI = document.querySelector('#turn');
     const resetButtonUI = document.getElementById('reset-button');
+    const backToGameModeButtonUI = document.getElementById('back-to-game-mode')
     const gameModeUI = document.getElementById('game-mode');
     const winnerMessageUI = document.getElementById('winner-message');
 
     const reset = () => {
         turnUI.classList.remove('hidden');
         resetButtonUI.classList.remove('hidden');
-        gameModeUI.style.display = "none";
+        backToGameModeButtonUI.classList.remove('hidden');
+        gameModeUI.style.display = 'none';
+        boardUI.style.display = '';
+        winnerMessageUI.classList.add('hidden');
+    }
+    
+    const homeScreen = () => {
+        turnUI.classList.add('hidden');
+        resetButtonUI.classList.add('hidden');
+        backToGameModeButtonUI.classList.add('hidden');
+        boardUI.style.display = 'none';
+        gameModeUI.style.display = '';
         winnerMessageUI.classList.add('hidden');
     }
     
@@ -439,6 +455,7 @@ function DisplayController(){
         setBoard,
         playerTurn,
         winnerMessage,
+        homeScreen,
         reset
     }
 
