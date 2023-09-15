@@ -130,6 +130,10 @@ function GameController() {
 
     const render = DisplayController();
 
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     const players = [
         {
             name: 'Player X',
@@ -173,12 +177,15 @@ function GameController() {
             if(result == 'X'){
                 setGameCondition(false)
                 render.winnerMessage(result);
+                return true;
             } else if (result == 'O'){
                 setGameCondition(false)
                 render.winnerMessage(result);
+                return true;
             } else if(result == 'draw'){
                 setGameCondition(false)
                 render.winnerMessage(result);
+                return true;
             }
         }
         
@@ -314,37 +321,50 @@ function GameController() {
     const twoPlayer = (row, column) => {
         render.playerTurn(getActivePlayer().name);
         if(board.setMove(row, column, getActivePlayer().token) == true){
-            console.log(winnerMessage());
+            winnerMessage();
         } else {
             twoPlayer();
         }    
         newRound(twoPlayer);
     }    
 
-    const vsComp = () => {
-        if(getActivePlayer().token == 'O'){
+    const vsComp = (row, column) => {
+        render.playerTurn(getActivePlayer().name);
+        async function computerTurn() {
+            await sleep(500);
             [row, column] = getRandomMove();
+                if(board.setMove(row, column, getActivePlayer().token) == true){
+                    if(winnerMessage() == true){
+                        return;
+                    };
+                } else {
+                    vsComp();
+                }
+                newRound(vsComp);
+        }
+
+        async function playerTurn() {
+            render.stopBoard();
+            await sleep(100);
+            render.activeBoard();
             if(board.setMove(row, column, getActivePlayer().token) == true){
-                alert(`Computer was put move on row: ${row}, and colum: ${column}`)
-                console.log(winnerMessage());
-            } else {
-                vsComp();
-            }
-            newRound(vsComp);
-        } else {
-            alert(`You're ${getActivePlayer().name}, please input your move`)
-            row = parseInt(prompt("input your row!"));
-            column = parseInt(prompt("input your column!"));
-            if(board.setMove(row, column, getActivePlayer().token) == true){
-                console.log(winnerMessage());
+                if(winnerMessage() == true){
+                    return;
+                };
             } else {
                 vsComp();
             }
             newRound(vsComp);
         }
+
+        if(getActivePlayer().token == 'O'){
+            computerTurn();
+        } else {
+            playerTurn()
+        }
     }
 
-    const vsAi = () => {
+    const vsAi = (row, column) => {
         if(getActivePlayer().token == 'O'){
             [row, column] = getBestMove(board.getBoard());
             if(board.setMove(row, column, getActivePlayer().token) == true){
@@ -356,8 +376,6 @@ function GameController() {
             newRound(vsAi);
         } else {
             alert(`You're ${getActivePlayer().name}, please input your move`)
-            row = parseInt(prompt("input your row!"));
-            column = parseInt(prompt("input your column!"));
             if(board.setMove(row, column, getActivePlayer().token) == true){
                 console.log(winnerMessage());
             } else {
@@ -368,33 +386,60 @@ function GameController() {
     }
 
     const twoPlayerButton = document.getElementById('two-player');
+    const vsCompButton = document.getElementById('vs-computer');
+    const vsAIButton = document.getElementById('vs-ai');
+
 
     twoPlayerButton.addEventListener('click', () => {
         render.reset();
-        render.setBoard(board.getBoard());
+        render.setBoard(board.resetBoard());
     
         window.addEventListener('click', (e) => {
-            if(e.target.classList.contains('cell')){
+            that = e.target;
+            if(that.classList.contains('cell')){
                 row = e.target.getAttribute('data-row');
                 column = e.target.getAttribute('data-column')
                 twoPlayer(row, column);
             }
-
-            if(e.target.id == 'reset-button'){
+    
+            if(that.id == 'reset-button'){
                 resetPlayer();
                 render.playerTurn(getActivePlayer().name);
                 render.setBoard(board.resetBoard());
                 render.reset();
             }
-
-            if(e.target.id == 'back-to-game-mode'){
+    
+            if(that.id == 'back-to-game-mode'){
                 render.homeScreen();
             }
-        });
-        
+        });  
     })
 
-
+    vsCompButton.addEventListener('click', () => {
+        render.reset();
+        render.setBoard(board.resetBoard());
+    
+        window.addEventListener('click', (e) => {
+            that = e.target;
+            if(that.classList.contains('cell')){
+                row = e.target.getAttribute('data-row');
+                column = e.target.getAttribute('data-column')
+                vsComp(row, column);
+            }
+    
+            if(that.id == 'reset-button'){
+                resetPlayer();
+                render.playerTurn(getActivePlayer().name);
+                render.setBoard(board.resetBoard());
+                render.reset();
+                setGameCondition(true);
+            }
+    
+            if(that.id == 'back-to-game-mode'){
+                render.homeScreen();
+            }
+        });  
+    })
 
     return {
         twoPlayer,
@@ -420,6 +465,7 @@ function DisplayController(){
         gameModeUI.style.display = 'none';
         boardUI.style.display = '';
         winnerMessageUI.classList.add('hidden');
+        activeBoard();
     }
     
     const homeScreen = () => {
@@ -449,10 +495,21 @@ function DisplayController(){
     const winnerMessage = (result) => {
         winnerMessageUI.classList.remove('hidden');
         winnerMessageUI.textContent = `${result == 'draw' ? 'Draw' : result + ' Winner'}`;
+        stopBoard();
+    }
+    
+    const stopBoard = () => {
+        boardUI.style.cssText = 'pointer-events: none';
+    }
+    
+    const activeBoard = () => {
+        boardUI.style.cssText = 'pointer-events: auto';
     }
 
     return {
         setBoard,
+        stopBoard,
+        activeBoard,
         playerTurn,
         winnerMessage,
         homeScreen,
