@@ -182,11 +182,13 @@ function GameController() {
                 setGameCondition(false)
                 render.winnerMessage(result);
                 return true;
-            } else if(result == 'draw'){
-                setGameCondition(false)
-                render.winnerMessage(result);
-                return true;
             }
+        } 
+        
+        if (printRound() == false) {
+            setGameCondition(false)
+            render.winnerMessage(result);
+            return true;
         }
         
     }
@@ -215,7 +217,7 @@ function GameController() {
         }
 
         if(printRound() == false){
-            return 'draw';
+            return 'draw'
         }
 
         return null;
@@ -287,7 +289,7 @@ function GameController() {
         let result = checkWinner(boardValue);
         if(result !== null){
             return scores[result];
-        }
+        } 
 
         if(isMaximizing){
             let bestScore = -Infinity;
@@ -365,23 +367,39 @@ function GameController() {
     }
 
     const vsAi = (row, column) => {
-        if(getActivePlayer().token == 'O'){
+        render.playerTurn(getActivePlayer().name);
+
+        async function aiTurn() {
+            await sleep(200);
             [row, column] = getBestMove(board.getBoard());
+                if(board.setMove(row, column, getActivePlayer().token) == true){
+                    if(winnerMessage() == true){
+                        return;
+                    };
+                } else {
+                    vsAi();
+                }
+                newRound(vsAi);
+        }
+
+        async function playerTurn() {
+            render.stopBoard();
+            await sleep(100);
+            render.activeBoard();
             if(board.setMove(row, column, getActivePlayer().token) == true){
-                alert(`Computer was put move on row: ${row}, and colum: ${column}`)
-                console.log(winnerMessage());
+                if(winnerMessage() == true){
+                    return;
+                };
             } else {
                 vsAi();
             }
             newRound(vsAi);
+        }
+
+        if(getActivePlayer().token == 'O'){
+            aiTurn()
         } else {
-            alert(`You're ${getActivePlayer().name}, please input your move`)
-            if(board.setMove(row, column, getActivePlayer().token) == true){
-                console.log(winnerMessage());
-            } else {
-                vsAi();
-            }
-            newRound(vsAi);
+            playerTurn();
         }
     }
 
@@ -441,6 +459,33 @@ function GameController() {
         });  
     })
 
+    vsAIButton.addEventListener('click', () => {
+        render.reset();
+        render.setBoard(board.resetBoard());
+    
+        window.addEventListener('click', (e) => {
+            that = e.target;
+            if(that.classList.contains('cell')){
+                row = e.target.getAttribute('data-row');
+                column = e.target.getAttribute('data-column')
+                vsAi(row, column);
+            }
+    
+            if(that.id == 'reset-button'){
+                resetPlayer();
+                render.playerTurn(getActivePlayer().name);
+                render.setBoard(board.resetBoard());
+                render.reset();
+                setGameCondition(true);
+            }
+    
+            if(that.id == 'back-to-game-mode'){
+                render.homeScreen();
+            }
+        });  
+    })
+    
+
     return {
         twoPlayer,
         vsComp,
@@ -494,7 +539,11 @@ function DisplayController(){
     
     const winnerMessage = (result) => {
         winnerMessageUI.classList.remove('hidden');
-        winnerMessageUI.textContent = `${result == 'draw' ? 'Draw' : result + ' Winner'}`;
+        if(result === 'X' || result === 'O'){
+            winnerMessageUI.textContent = result + ' Winner'    
+        } else {
+            winnerMessageUI.textContent = 'Draw';   
+        }
         stopBoard();
     }
     
